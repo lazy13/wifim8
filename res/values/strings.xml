@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, Wifim8Activity!</string>
+    <string name="hello">Yo ho join my apk</string>
     <string name="app_name">Wifim8</string>
+    <string name="RECORDING_STARTED">Started</string>
+    
 
 </resources>
