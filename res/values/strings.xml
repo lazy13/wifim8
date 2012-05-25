@@ -4,6 +4,7 @@
     <string name="hello">Yo ho join my apk</string>
     <string name="app_name">Wifim8</string>
     <string name="RECORDING_STARTED">Started</string>
+    <string name="start">Start</string>
     
 
 </resources>
