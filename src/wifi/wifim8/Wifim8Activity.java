@@ -10,6 +10,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ public class Wifim8Activity extends Activity implements OnClickListener {
 	private static final String TAG = "WiFim8";
 	WifiManager wifi;
 	BroadcastReceiver receiver;
+	boolean isRunning = false;
 
 	TextView textStatus;
 	Button buttonScan;
@@ -42,17 +44,10 @@ public class Wifim8Activity extends Activity implements OnClickListener {
 		// Setup WiFi
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
-		// Get WiFi status
-		WifiInfo info = wifi.getConnectionInfo();
-		textStatus.append("\n\nWiFi Status: " + info.toString());		
-
 		// Register Broadcast Receiver
 		if (receiver == null)
-			receiver = new WiFiScanReceiver(this);
-
-		registerReceiver(receiver, new IntentFilter(
-				WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-		Log.d(TAG, "onCreate()");
+			receiver = new WiFiScanReceiver(this);		
+		
 	}
 
 	@Override
@@ -61,13 +56,41 @@ public class Wifim8Activity extends Activity implements OnClickListener {
 	}
 
 	public void onClick(View view) {
-		Toast.makeText(this, "On Click Clicked. Toast to that!!!",
-				Toast.LENGTH_LONG).show();
-
-		if (view.getId() == R.id.button1) {
-			Log.d(TAG, "onClick() wifi.startScan()");
-			wifi.startScan();
+		boolean wifiStatus = (boolean) wifi.isWifiEnabled();
+		if(wifiStatus){			
+			Toast.makeText(this, "Scan Started",
+					Toast.LENGTH_LONG).show();
+			if (view.getId() == R.id.button1) {
+				if(isRunning){
+					isRunning = false;
+					buttonScan.setText("Start");
+				}else{
+					isRunning = true;
+					buttonScan.setText("Stop");
+				}				
+				startScan();								
+			}
+		}else{
+			Toast.makeText(this, "Please enable Wifi in order to scan",
+					Toast.LENGTH_LONG).show();		
+		}		
+	}	
+	
+	
+	public void startScan(){
+		Handler handlerTimer = new Handler();
+		int interval = 10000;
+		Log.d(TAG, "onClick() wifi.startScan()");
+		wifi.startScan();
+		registerReceiver(receiver, new IntentFilter(
+				WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+		Log.d(TAG, "onCreate()");
+		if(isRunning){
+			handlerTimer.postDelayed(new Runnable(){
+		        public void run() {
+		        	startScan();
+		      }}, interval);
 		}
-	}
+	}	
 
 }
